@@ -55,6 +55,11 @@ const lessons = [
   }
 ];
 
+const alphabet = Array.from({ length: 26 }, (_, index) => ({
+  upper: String.fromCharCode(65 + index),
+  lower: String.fromCharCode(97 + index)
+}));
+
 let currentLessonIndex = 0;
 let stars = 0;
 
@@ -69,6 +74,27 @@ const playSoundBtn = document.getElementById('playSoundBtn');
 const nextBtn = document.getElementById('nextBtn');
 const prevBtn = document.getElementById('prevBtn');
 const starCount = document.getElementById('starCount');
+const alphabetGrid = document.getElementById('alphabetGrid');
+
+function renderAlphabetTable() {
+  alphabetGrid.innerHTML = '';
+
+  alphabet.forEach((char) => {
+    const item = document.createElement('div');
+    item.className = 'alphabet-item';
+
+    if (char.upper === lessons[currentLessonIndex].letter) {
+      item.classList.add('active');
+    }
+
+    item.innerHTML = `
+      <span class="upper">${char.upper}</span>
+      <span class="lower">${char.lower}</span>
+    `;
+
+    alphabetGrid.appendChild(item);
+  });
+}
 
 function renderLesson() {
   const lesson = lessons[currentLessonIndex];
@@ -78,6 +104,8 @@ function renderLesson() {
   progressFill.style.width = `${((currentLessonIndex + 1) / total) * 100}%`;
   letterBig.textContent = lesson.letter;
   document.getElementById('letterSmall').textContent = lesson.lowercase;
+
+  renderAlphabetTable();
 
   wordList.innerHTML = '';
   lesson.words.forEach((word) => {
@@ -172,4 +200,5 @@ prevBtn.addEventListener('click', () => {
   }
 });
 
+renderAlphabetTable();
 renderLesson();
