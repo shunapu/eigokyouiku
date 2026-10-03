@@ -2,6 +2,7 @@ const lessons = [
   {
     id: 1,
     letter: 'S',
+    lowercase: 's',
     sound: 's',
     words: ['sun', 'sock', 'star'],
     quizOptions: ['S', 'A', 'M'],
@@ -10,6 +11,7 @@ const lessons = [
   {
     id: 2,
     letter: 'A',
+    lowercase: 'a',
     sound: 'a',
     words: ['apple', 'ant', 'cat'],
     quizOptions: ['A', 'T', 'P'],
@@ -18,6 +20,7 @@ const lessons = [
   {
     id: 3,
     letter: 'T',
+    lowercase: 't',
     sound: 't',
     words: ['tap', 'toy', 'tree'],
     quizOptions: ['T', 'S', 'N'],
@@ -26,6 +29,7 @@ const lessons = [
   {
     id: 4,
     letter: 'P',
+    lowercase: 'p',
     sound: 'p',
     words: ['pig', 'pen', 'pet'],
     quizOptions: ['P', 'S', 'A'],
@@ -34,6 +38,7 @@ const lessons = [
   {
     id: 5,
     letter: 'M',
+    lowercase: 'm',
     sound: 'm',
     words: ['moon', 'mouse', 'map'],
     quizOptions: ['M', 'T', 'P'],
@@ -42,6 +47,7 @@ const lessons = [
   {
     id: 6,
     letter: 'N',
+    lowercase: 'n',
     sound: 'n',
     words: ['nest', 'net', 'nut'],
     quizOptions: ['N', 'A', 'S'],
@@ -71,6 +77,7 @@ function renderLesson() {
   lessonLabel.textContent = `レッスン ${currentLessonIndex + 1} / ${total}`;
   progressFill.style.width = `${((currentLessonIndex + 1) / total) * 100}%`;
   letterBig.textContent = lesson.letter;
+  document.getElementById('letterSmall').textContent = lesson.lowercase;
 
   wordList.innerHTML = '';
   lesson.words.forEach((word) => {
