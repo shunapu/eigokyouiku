@@ -1,11 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    さあ英語を学ぼう
-</body>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phonics Adventure</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">フォニックス英語</p>
+          <h1>Phonics Adventure</h1>
+        </div>
+        <div class="stars" id="starCount">⭐ 0</div>
+      </header>
+
+      <main class="panel">
+        <section class="lesson-card">
+          <div class="progress-wrap">
+            <span id="lessonLabel">レッスン 1 / 6</span>
+            <div class="progress-bar">
+              <div id="progressFill"></div>
+            </div>
+          </div>
+
+          <div class="letter-box">
+            <span class="letter" id="letterBig">S</span>
+            <button class="sound-btn" id="playSoundBtn">🔊 音を聞く</button>
+          </div>
+
+          <div class="word-list" id="wordList"></div>
+
+          <div class="actions">
+            <button id="prevBtn" class="secondary">前へ</button>
+            <button id="nextBtn" class="primary">次へ</button>
+          </div>
+        </section>
+
+        <section class="quiz-card">
+          <h2>クイズ</h2>
+          <p id="quizQuestion">どの文字の音ですか？</p>
+          <div id="quizOptions" class="quiz-options"></div>
+          <p id="quizMessage" class="quiz-message"></p>
+        </section>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
 </html>
