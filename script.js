@@ -3,7 +3,7 @@ const lessons = [
     id: 1,
     letter: 'S',
     lowercase: 's',
-    sound: 's',
+    phonicsSound: 'ス',
     words: ['sun', 'sock', 'star'],
     quizOptions: ['S', 'A', 'M'],
     answer: 'S'
@@ -12,7 +12,7 @@ const lessons = [
     id: 2,
     letter: 'A',
     lowercase: 'a',
-    sound: 'a',
+    phonicsSound: 'ア',
     words: ['apple', 'ant', 'cat'],
     quizOptions: ['A', 'T', 'P'],
     answer: 'A'
@@ -21,7 +21,7 @@ const lessons = [
     id: 3,
     letter: 'T',
     lowercase: 't',
-    sound: 't',
+    phonicsSound: 'トゥ',
     words: ['tap', 'toy', 'tree'],
     quizOptions: ['T', 'S', 'N'],
     answer: 'T'
@@ -30,7 +30,7 @@ const lessons = [
     id: 4,
     letter: 'P',
     lowercase: 'p',
-    sound: 'p',
+    phonicsSound: 'プ',
     words: ['pig', 'pen', 'pet'],
     quizOptions: ['P', 'S', 'A'],
     answer: 'P'
@@ -39,7 +39,7 @@ const lessons = [
     id: 5,
     letter: 'M',
     lowercase: 'm',
-    sound: 'm',
+    phonicsSound: 'ム',
     words: ['moon', 'mouse', 'map'],
     quizOptions: ['M', 'T', 'P'],
     answer: 'M'
@@ -48,7 +48,7 @@ const lessons = [
     id: 6,
     letter: 'N',
     lowercase: 'n',
-    sound: 'n',
+    phonicsSound: 'ン',
     words: ['nest', 'net', 'nut'],
     quizOptions: ['N', 'A', 'S'],
     answer: 'N'
@@ -172,7 +172,7 @@ function speak(text) {
 
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'en-US';
+  utterance.lang = 'ja-JP';
   utterance.rate = 0.8;
   utterance.pitch = 1.2;
   window.speechSynthesis.speak(utterance);
@@ -180,7 +180,7 @@ function speak(text) {
 
 playSoundBtn.addEventListener('click', () => {
   const lesson = lessons[currentLessonIndex];
-  speak(lesson.sound);
+  speak(lesson.phonicsSound);
 });
 
 nextBtn.addEventListener('click', () => {
