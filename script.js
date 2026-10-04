@@ -4,54 +4,42 @@ const lessons = [
     letter: 'S',
     lowercase: 's',
     phonicsSound: 'ス',
-    words: ['sun', 'sock', 'star'],
-    quizOptions: ['S', 'A', 'M'],
-    answer: 'S'
+    words: ['sun', 'sock', 'star']
   },
   {
     id: 2,
     letter: 'A',
     lowercase: 'a',
     phonicsSound: 'ア',
-    words: ['apple', 'ant', 'cat'],
-    quizOptions: ['A', 'T', 'P'],
-    answer: 'A'
+    words: ['apple', 'ant', 'cat']
   },
   {
     id: 3,
     letter: 'T',
     lowercase: 't',
     phonicsSound: 'トゥ',
-    words: ['tap', 'toy', 'tree'],
-    quizOptions: ['T', 'S', 'N'],
-    answer: 'T'
+    words: ['tap', 'toy', 'tree']
   },
   {
     id: 4,
     letter: 'P',
     lowercase: 'p',
     phonicsSound: 'プ',
-    words: ['pig', 'pen', 'pet'],
-    quizOptions: ['P', 'S', 'A'],
-    answer: 'P'
+    words: ['pig', 'pen', 'pet']
   },
   {
     id: 5,
     letter: 'M',
     lowercase: 'm',
     phonicsSound: 'ム',
-    words: ['moon', 'mouse', 'map'],
-    quizOptions: ['M', 'T', 'P'],
-    answer: 'M'
+    words: ['moon', 'mouse', 'map']
   },
   {
     id: 6,
     letter: 'N',
     lowercase: 'n',
     phonicsSound: 'ン',
-    words: ['nest', 'net', 'nut'],
-    quizOptions: ['N', 'A', 'S'],
-    answer: 'N'
+    words: ['nest', 'net', 'nut']
   }
 ];
 
@@ -84,35 +72,26 @@ const alphabet = Array.from({ length: 26 }, (_, index) => ({
 }));
 
 additionalLessons.forEach((lesson) => {
-  const letterIndex = lesson.letter.charCodeAt(0) - 65;
   lessons.push({
     id: lessons.length + 1,
     ...lesson,
-    lowercase: lesson.letter.toLowerCase(),
-    quizOptions: [
-      lesson.letter,
-      String.fromCharCode(65 + ((letterIndex + 1) % 26)),
-      String.fromCharCode(65 + ((letterIndex + 2) % 26))
-    ],
-    answer: lesson.letter
+    lowercase: lesson.letter.toLowerCase()
   });
 });
 
 let currentLessonIndex = 0;
-let stars = 0;
+let score = 0;
 
 const lessonLabel = document.getElementById('lessonLabel');
 const progressFill = document.getElementById('progressFill');
 const letterBig = document.getElementById('letterBig');
 const wordList = document.getElementById('wordList');
-const quizQuestion = document.getElementById('quizQuestion');
-const quizOptions = document.getElementById('quizOptions');
-const quizMessage = document.getElementById('quizMessage');
 const playSoundBtn = document.getElementById('playSoundBtn');
 const nextBtn = document.getElementById('nextBtn');
 const prevBtn = document.getElementById('prevBtn');
-const starCount = document.getElementById('starCount');
+const scoreCount = document.getElementById('scoreCount');
 const alphabetGrid = document.getElementById('alphabetGrid');
+const balloonGame = document.getElementById('balloonGame');
 
 function renderAlphabetTable() {
   alphabetGrid.innerHTML = '';
@@ -162,53 +141,8 @@ function renderLesson() {
     wordList.appendChild(item);
   });
 
-  quizQuestion.textContent = `${lesson.letter}の音はどれ？`;
-  quizOptions.innerHTML = '';
-  quizMessage.textContent = '';
-
-  lesson.quizOptions.forEach((option) => {
-    const button = document.createElement('button');
-    button.className = 'quiz-option';
-    button.textContent = option;
-    button.addEventListener('click', () => handleAnswer(option, button));
-    quizOptions.appendChild(button);
-  });
-
   prevBtn.disabled = currentLessonIndex === 0;
   prevBtn.style.opacity = currentLessonIndex === 0 ? '0.5' : '1';
-}
-
-function handleAnswer(selected, button) {
-  const lesson = lessons[currentLessonIndex];
-  const optionButtons = [...document.querySelectorAll('.quiz-option')];
-
-  optionButtons.forEach((optionButton) => {
-    optionButton.disabled = true;
-    optionButton.classList.remove('selected');
-
-    if (optionButton.textContent === lesson.answer) {
-      optionButton.classList.add('correct');
-    }
-
-    if (
-      optionButton === button &&
-      optionButton.textContent !== lesson.answer
-    ) {
-      optionButton.classList.add('wrong');
-    }
-  });
-
-  button.classList.add('selected');
-
-  if (selected === lesson.answer) {
-    stars += 1;
-    starCount.textContent = `⭐ ${stars}`;
-    quizMessage.textContent = 'すごい！正解！';
-    quizMessage.style.color = '#2dbd6e';
-  } else {
-    quizMessage.textContent = `答えは ${lesson.answer} だよ！`;
-    quizMessage.style.color = '#e74c3c';
-  }
 }
 
 function speak(text, lang = 'ja-JP') {
@@ -225,10 +159,37 @@ function speak(text, lang = 'ja-JP') {
   window.speechSynthesis.speak(utterance);
 }
 
+function spawnBalloon() {
+  const char = alphabet[Math.floor(Math.random() * alphabet.length)];
+  const lesson = lessons.find((item) => item.letter === char.upper);
+  const balloon = document.createElement('button');
+  const color = Math.floor(Math.random() * 6) + 1;
+  const duration = 7 + Math.random() * 4;
+
+  balloon.className = `balloon balloon-color-${color}`;
+  balloon.type = 'button';
+  balloon.textContent = char.upper;
+  balloon.setAttribute('aria-label', `${char.upper}の風船をタップして1点`);
+  balloon.style.left = `${8 + Math.random() * 84}%`;
+  balloon.style.animationDuration = `${duration}s`;
+  balloon.addEventListener('click', () => {
+    score += 1;
+    scoreCount.textContent = `🎈 ${score}点`;
+    balloon.remove();
+    speak(lesson.phonicsSound);
+  });
+  balloon.addEventListener('animationend', () => balloon.remove());
+
+  balloonGame.appendChild(balloon);
+}
+
 playSoundBtn.addEventListener('click', () => {
   const lesson = lessons[currentLessonIndex];
   speak(lesson.phonicsSound);
 });
+
+spawnBalloon();
+window.setInterval(spawnBalloon, 1100);
 
 nextBtn.addEventListener('click', () => {
   if (currentLessonIndex < lessons.length - 1) {

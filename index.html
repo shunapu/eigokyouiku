@@ -13,7 +13,7 @@
           <p class="eyebrow">フォニックス英語</p>
           <h1>Phonics Adventure</h1>
         </div>
-        <div class="stars" id="starCount">⭐ 0</div>
+        <div class="stars" id="scoreCount" role="status" aria-live="polite">🎈 0点</div>
       </header>
 
       <main class="panel">
@@ -47,11 +47,10 @@
           </div>
         </section>
 
-        <section class="quiz-card">
-          <h2>クイズ</h2>
-          <p id="quizQuestion">どの文字の音ですか？</p>
-          <div id="quizOptions" class="quiz-options"></div>
-          <p id="quizMessage" class="quiz-message"></p>
+        <section class="game-card">
+          <h2>ふうせんゲーム</h2>
+          <p class="game-instructions">上に飛んでいく風船をタップしてポイントをゲット！</p>
+          <div id="balloonGame" class="balloon-game" aria-label="アルファベットの風船ゲーム"></div>
         </section>
 
         <section class="alphabet-card">
