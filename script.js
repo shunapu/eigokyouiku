@@ -143,6 +143,9 @@ function renderLesson() {
 
   prevBtn.disabled = currentLessonIndex === 0;
   prevBtn.style.opacity = currentLessonIndex === 0 ? '0.5' : '1';
+
+  balloonGame.innerHTML = '';
+  spawnBalloon();
 }
 
 function speak(text, lang = 'ja-JP') {
@@ -160,16 +163,15 @@ function speak(text, lang = 'ja-JP') {
 }
 
 function spawnBalloon() {
-  const char = alphabet[Math.floor(Math.random() * alphabet.length)];
-  const lesson = lessons.find((item) => item.letter === char.upper);
+  const lesson = lessons[currentLessonIndex];
   const balloon = document.createElement('button');
   const color = Math.floor(Math.random() * 6) + 1;
   const duration = 7 + Math.random() * 4;
 
   balloon.className = `balloon balloon-color-${color}`;
   balloon.type = 'button';
-  balloon.textContent = char.upper;
-  balloon.setAttribute('aria-label', `${char.upper}の風船をタップして1点`);
+  balloon.textContent = lesson.letter;
+  balloon.setAttribute('aria-label', `${lesson.letter}の風船をタップして1点`);
   balloon.style.left = `${8 + Math.random() * 84}%`;
   balloon.style.animationDuration = `${duration}s`;
   balloon.addEventListener('click', () => {
@@ -188,7 +190,6 @@ playSoundBtn.addEventListener('click', () => {
   speak(lesson.phonicsSound);
 });
 
-spawnBalloon();
 window.setInterval(spawnBalloon, 1100);
 
 nextBtn.addEventListener('click', () => {
