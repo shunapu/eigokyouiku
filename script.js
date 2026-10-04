@@ -178,7 +178,7 @@ function spawnBalloon() {
   const lesson = lessons[currentLessonIndex];
   const balloon = document.createElement('button');
   const color = Math.floor(Math.random() * 6) + 1;
-  const duration = 7 + Math.random() * 4;
+  const duration = 3.5 + Math.random() * 2;
 
   balloon.className = `balloon balloon-color-${color}`;
   balloon.type = 'button';
