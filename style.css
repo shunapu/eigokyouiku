@@ -236,12 +236,19 @@ h1 {
   align-items: center;
   justify-content: center;
   gap: 4px;
+  padding: 8px;
   background: #fffaf2;
   border: 2px solid #f5d7ae;
   border-radius: 14px;
   min-height: 80px;
+  font-family: inherit;
   font-weight: 800;
   color: var(--text);
+}
+
+.alphabet-item:focus-visible {
+  outline: 3px solid var(--main-deep);
+  outline-offset: 2px;
 }
 
 .alphabet-item .upper {

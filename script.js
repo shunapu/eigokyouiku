@@ -55,10 +55,48 @@ const lessons = [
   }
 ];
 
+const additionalLessons = [
+  { letter: 'B', phonicsSound: 'ブ', words: ['ball', 'bat', 'bed'] },
+  { letter: 'C', phonicsSound: 'ク', words: ['cat', 'cup', 'cake'] },
+  { letter: 'D', phonicsSound: 'ドゥ', words: ['dog', 'duck', 'desk'] },
+  { letter: 'E', phonicsSound: 'エ', words: ['egg', 'elephant', 'end'] },
+  { letter: 'F', phonicsSound: 'フ', words: ['fish', 'fan', 'fox'] },
+  { letter: 'G', phonicsSound: 'グ', words: ['goat', 'gift', 'gum'] },
+  { letter: 'H', phonicsSound: 'ハ', words: ['hat', 'hen', 'hop'] },
+  { letter: 'I', phonicsSound: 'イ', words: ['igloo', 'ink', 'insect'] },
+  { letter: 'J', phonicsSound: 'ジ', words: ['jam', 'jet', 'jug'] },
+  { letter: 'K', phonicsSound: 'ク', words: ['kite', 'key', 'kitten'] },
+  { letter: 'L', phonicsSound: 'ル', words: ['lion', 'leg', 'lamp'] },
+  { letter: 'O', phonicsSound: 'オ', words: ['octopus', 'ox', 'on'] },
+  { letter: 'Q', phonicsSound: 'クゥ', words: ['queen', 'quilt', 'quiz'] },
+  { letter: 'R', phonicsSound: 'ル', words: ['rabbit', 'red', 'run'] },
+  { letter: 'U', phonicsSound: 'ア', words: ['umbrella', 'up', 'under'] },
+  { letter: 'V', phonicsSound: 'ヴ', words: ['van', 'vet', 'vest'] },
+  { letter: 'W', phonicsSound: 'ウ', words: ['watch', 'web', 'wig'] },
+  { letter: 'X', phonicsSound: 'クス', words: ['box', 'fox', 'six'] },
+  { letter: 'Y', phonicsSound: 'イ', words: ['yak', 'yes', 'yell'] },
+  { letter: 'Z', phonicsSound: 'ズ', words: ['zebra', 'zip', 'zero'] }
+];
+
 const alphabet = Array.from({ length: 26 }, (_, index) => ({
   upper: String.fromCharCode(65 + index),
   lower: String.fromCharCode(97 + index)
 }));
+
+additionalLessons.forEach((lesson) => {
+  const letterIndex = lesson.letter.charCodeAt(0) - 65;
+  lessons.push({
+    id: lessons.length + 1,
+    ...lesson,
+    lowercase: lesson.letter.toLowerCase(),
+    quizOptions: [
+      lesson.letter,
+      String.fromCharCode(65 + ((letterIndex + 1) % 26)),
+      String.fromCharCode(65 + ((letterIndex + 2) % 26))
+    ],
+    answer: lesson.letter
+  });
+});
 
 let currentLessonIndex = 0;
 let stars = 0;
@@ -80,8 +118,10 @@ function renderAlphabetTable() {
   alphabetGrid.innerHTML = '';
 
   alphabet.forEach((char) => {
-    const item = document.createElement('div');
+    const item = document.createElement('button');
     item.className = 'alphabet-item';
+    item.type = 'button';
+    item.setAttribute('aria-label', `レッスン ${char.upper}`);
 
     if (char.upper === lessons[currentLessonIndex].letter) {
       item.classList.add('active');
@@ -91,6 +131,10 @@ function renderAlphabetTable() {
       <span class="upper">${char.upper}</span>
       <span class="lower">${char.lower}</span>
     `;
+    item.addEventListener('click', () => {
+      currentLessonIndex = lessons.findIndex((lesson) => lesson.letter === char.upper);
+      renderLesson();
+    });
 
     alphabetGrid.appendChild(item);
   });
@@ -200,5 +244,4 @@ prevBtn.addEventListener('click', () => {
   }
 });
 
-renderAlphabetTable();
 renderLesson();
