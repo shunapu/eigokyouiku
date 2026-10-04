@@ -153,9 +153,12 @@ function renderLesson() {
 
   wordList.innerHTML = '';
   lesson.words.forEach((word) => {
-    const item = document.createElement('div');
+    const item = document.createElement('button');
     item.className = 'word-item';
+    item.type = 'button';
+    item.setAttribute('aria-label', `${word}の発音を聞く`);
     item.textContent = word;
+    item.addEventListener('click', () => speak(word, 'en-US'));
     wordList.appendChild(item);
   });
 
@@ -208,7 +211,7 @@ function handleAnswer(selected, button) {
   }
 }
 
-function speak(text) {
+function speak(text, lang = 'ja-JP') {
   if (!('speechSynthesis' in window)) {
     alert('このブラウザでは音声再生が使えません。');
     return;
@@ -216,7 +219,7 @@ function speak(text) {
 
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'ja-JP';
+  utterance.lang = lang;
   utterance.rate = 0.8;
   utterance.pitch = 1.2;
   window.speechSynthesis.speak(utterance);

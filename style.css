@@ -189,6 +189,7 @@ h1 {
 }
 
 .word-item {
+  width: 100%;
   background: #f9f9ff;
   border: 2px solid #e7e9ff;
   border-radius: 18px;
@@ -196,6 +197,13 @@ h1 {
   text-align: center;
   font-size: 1.1rem;
   font-weight: 700;
+  font-family: inherit;
+  color: var(--text);
+}
+
+.word-item:focus-visible {
+  outline: 3px solid var(--main-deep);
+  outline-offset: 2px;
 }
 
 .actions {
