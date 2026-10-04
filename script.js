@@ -81,6 +81,8 @@ additionalLessons.forEach((lesson) => {
 
 let currentLessonIndex = 0;
 let score = 0;
+let gameStarted = false;
+let balloonInterval = null;
 
 const lessonLabel = document.getElementById('lessonLabel');
 const progressFill = document.getElementById('progressFill');
@@ -92,6 +94,7 @@ const prevBtn = document.getElementById('prevBtn');
 const scoreCount = document.getElementById('scoreCount');
 const alphabetGrid = document.getElementById('alphabetGrid');
 const balloonGame = document.getElementById('balloonGame');
+const startGameBtn = document.getElementById('startGameBtn');
 
 function renderAlphabetTable() {
   alphabetGrid.innerHTML = '';
@@ -112,6 +115,7 @@ function renderAlphabetTable() {
     `;
     item.addEventListener('click', () => {
       currentLessonIndex = lessons.findIndex((lesson) => lesson.letter === char.upper);
+      stopGame();
       renderLesson();
     });
 
@@ -145,7 +149,11 @@ function renderLesson() {
   prevBtn.style.opacity = currentLessonIndex === 0 ? '0.5' : '1';
 
   balloonGame.innerHTML = '';
-  spawnBalloon();
+  if (gameStarted) {
+    spawnBalloon();
+  } else {
+    balloonGame.appendChild(startGameBtn);
+  }
 }
 
 function speak(text, lang = 'ja-JP') {
@@ -163,6 +171,10 @@ function speak(text, lang = 'ja-JP') {
 }
 
 function spawnBalloon() {
+  if (!gameStarted) {
+    return;
+  }
+
   const lesson = lessons[currentLessonIndex];
   const balloon = document.createElement('button');
   const color = Math.floor(Math.random() * 6) + 1;
@@ -185,19 +197,38 @@ function spawnBalloon() {
   balloonGame.appendChild(balloon);
 }
 
+function stopGame() {
+  gameStarted = false;
+  if (balloonInterval !== null) {
+    window.clearInterval(balloonInterval);
+    balloonInterval = null;
+  }
+}
+
 playSoundBtn.addEventListener('click', () => {
   const lesson = lessons[currentLessonIndex];
   speak(lesson.phonicsSound);
 });
 
-window.setInterval(spawnBalloon, 1100);
+startGameBtn.addEventListener('click', () => {
+  if (gameStarted) {
+    return;
+  }
+
+  gameStarted = true;
+  startGameBtn.remove();
+  spawnBalloon();
+  balloonInterval = window.setInterval(spawnBalloon, 1100);
+});
 
 nextBtn.addEventListener('click', () => {
   if (currentLessonIndex < lessons.length - 1) {
     currentLessonIndex += 1;
+    stopGame();
     renderLesson();
   } else {
     currentLessonIndex = 0;
+    stopGame();
     renderLesson();
   }
 });
@@ -205,6 +236,7 @@ nextBtn.addEventListener('click', () => {
 prevBtn.addEventListener('click', () => {
   if (currentLessonIndex > 0) {
     currentLessonIndex -= 1;
+    stopGame();
     renderLesson();
   }
 });
