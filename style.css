@@ -229,10 +229,102 @@ h1 {
   height: 360px;
   overflow: hidden;
   border-radius: 18px;
+  background: linear-gradient(180deg, #e5f8ff, #f4fbff 75%, #eaf8ec);
+  transition: background 0.4s ease;
+}
+
+.balloon-game.mode-balloon {
   background:
-    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.9) 0 3px, transparent 4px),
-    radial-gradient(circle at 75% 35%, rgba(255, 255, 255, 0.8) 0 4px, transparent 5px),
-    linear-gradient(180deg, #e5f8ff 0%, #f4fbff 75%, #eaf8ec 100%);
+    radial-gradient(ellipse at 16% 25%, rgba(255, 255, 255, 0.9) 0 8%, transparent 8.5%),
+    radial-gradient(ellipse at 25% 23%, rgba(255, 255, 255, 0.9) 0 10%, transparent 10.5%),
+    radial-gradient(ellipse at 34% 26%, rgba(255, 255, 255, 0.9) 0 7%, transparent 7.5%),
+    radial-gradient(ellipse at 72% 48%, rgba(255, 255, 255, 0.8) 0 8%, transparent 8.5%),
+    radial-gradient(ellipse at 82% 46%, rgba(255, 255, 255, 0.8) 0 10%, transparent 10.5%),
+    linear-gradient(180deg, #64c9ff 0%, #bcecff 72%, #d8f5ce 72%, #a9d995 100%);
+}
+
+.balloon-game.mode-bubble {
+  background:
+    radial-gradient(circle at 15% 25%, rgba(215, 250, 255, 0.58) 0 5px, transparent 6px),
+    radial-gradient(circle at 78% 18%, rgba(215, 250, 255, 0.5) 0 8px, transparent 9px),
+    radial-gradient(circle at 58% 55%, rgba(215, 250, 255, 0.4) 0 4px, transparent 5px),
+    radial-gradient(ellipse at 50% 0%, rgba(146, 237, 255, 0.42), transparent 55%),
+    linear-gradient(180deg, #087eaa 0%, #07517c 70%, #063957 100%);
+}
+
+.game-celebration {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.86);
+  text-align: center;
+}
+
+.game-crackers {
+  z-index: 1;
+  font-size: 2rem;
+  animation: cracker-pop 0.7s ease-in-out infinite alternate;
+}
+
+.celebration-message,
+.celebration-result {
+  z-index: 1;
+  margin: 8px 0;
+}
+
+.celebration-message {
+  color: var(--main-deep);
+  font-size: clamp(1.7rem, 5vw, 2.4rem);
+}
+
+.celebration-result {
+  color: var(--text);
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.game-celebration .game-start-btn {
+  position: relative;
+  top: auto;
+  left: auto;
+  margin-top: 10px;
+  transform: none;
+}
+
+.game-celebration .game-start-btn:hover {
+  transform: translateY(-1px);
+}
+
+.confetti {
+  position: absolute;
+  top: -12px;
+  width: 9px;
+  height: 14px;
+  animation: confetti-fall 2.5s linear infinite;
+}
+
+.confetti-color-1 { background: #ff6b9a; }
+.confetti-color-2 { background: #4ecdc4; }
+.confetti-color-3 { background: #ff9f43; }
+.confetti-color-4 { background: #8e7dff; }
+.confetti-color-5 { background: #5b9dff; }
+.confetti-color-6 { background: #f2bd3d; }
+
+@keyframes confetti-fall {
+  to {
+    transform: translateY(390px) rotate(720deg);
+  }
+}
+
+@keyframes cracker-pop {
+  to {
+    transform: scale(1.2) rotate(8deg);
+  }
 }
 
 .game-start-btn {
@@ -298,6 +390,37 @@ h1 {
 .balloon-color-4 { background: #8e7dff; }
 .balloon-color-5 { background: #5b9dff; }
 .balloon-color-6 { background: #f2bd3d; }
+
+.bubble {
+  width: 68px;
+  height: 68px;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  box-shadow: inset -6px -7px 12px rgba(31, 45, 61, 0.12), inset 5px 5px 10px rgba(255, 255, 255, 0.55), 0 5px 10px rgba(31, 45, 61, 0.1);
+}
+
+.bubble::before {
+  top: 10px;
+  bottom: auto;
+  left: 13px;
+  width: 17px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  clip-path: none;
+  transform: rotate(35deg);
+}
+
+.bubble::after {
+  content: none;
+}
+
+.bubble.balloon-color-1 { background: radial-gradient(circle at 32% 28%, #ffd6e5, #ff6b9a 70%); }
+.bubble.balloon-color-2 { background: radial-gradient(circle at 32% 28%, #d2fffa, #4ecdc4 70%); }
+.bubble.balloon-color-3 { background: radial-gradient(circle at 32% 28%, #ffe2bd, #ff9f43 70%); }
+.bubble.balloon-color-4 { background: radial-gradient(circle at 32% 28%, #e0d9ff, #8e7dff 70%); }
+.bubble.balloon-color-5 { background: radial-gradient(circle at 32% 28%, #d9eaff, #5b9dff 70%); }
+.bubble.balloon-color-6 { background: radial-gradient(circle at 32% 28%, #fff3bd, #f2bd3d 70%); }
 
 .balloon:hover {
   transform: translateX(-50%);

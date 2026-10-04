@@ -71,6 +71,8 @@ const alphabet = Array.from({ length: 26 }, (_, index) => ({
   lower: String.fromCharCode(97 + index)
 }));
 
+const MAX_SCORE = 10;
+
 additionalLessons.forEach((lesson) => {
   lessons.push({
     id: lessons.length + 1,
@@ -83,6 +85,7 @@ let currentLessonIndex = 0;
 let score = 0;
 let gameStarted = false;
 let balloonInterval = null;
+let gameMode = 'balloon';
 
 const lessonLabel = document.getElementById('lessonLabel');
 const progressFill = document.getElementById('progressFill');
@@ -180,17 +183,26 @@ function spawnBalloon() {
   const color = Math.floor(Math.random() * 6) + 1;
   const duration = 3.5 + Math.random() * 2;
 
-  balloon.className = `balloon balloon-color-${color}`;
+  balloon.className = `${gameMode} balloon balloon-color-${color}`;
   balloon.type = 'button';
   balloon.textContent = lesson.letter;
-  balloon.setAttribute('aria-label', `${lesson.letter}の風船をタップして1点`);
+  const targetName = gameMode === 'bubble' ? '泡' : '風船';
+  balloon.setAttribute('aria-label', `${lesson.letter}の${targetName}をタップして1点`);
   balloon.style.left = `${8 + Math.random() * 84}%`;
   balloon.style.animationDuration = `${duration}s`;
   balloon.addEventListener('click', () => {
+    if (!gameStarted || score >= MAX_SCORE) {
+      return;
+    }
+
     score += 1;
-    scoreCount.textContent = `🎈 ${score}点`;
+    scoreCount.textContent = `🎮 ${score} / ${MAX_SCORE}点`;
     balloon.remove();
     speak(lesson.phonicsSound);
+
+    if (score === MAX_SCORE) {
+      finishGame();
+    }
   });
   balloon.addEventListener('animationend', () => balloon.remove());
 
@@ -199,10 +211,69 @@ function spawnBalloon() {
 
 function stopGame() {
   gameStarted = false;
+  balloonGame.classList.remove('mode-balloon', 'mode-bubble');
   if (balloonInterval !== null) {
     window.clearInterval(balloonInterval);
     balloonInterval = null;
   }
+}
+
+function finishGame() {
+  stopGame();
+  balloonGame.innerHTML = '';
+
+  const celebration = document.createElement('div');
+  celebration.className = 'game-celebration';
+  celebration.setAttribute('role', 'status');
+  celebration.setAttribute('aria-live', 'assertive');
+
+  const crackers = document.createElement('div');
+  crackers.className = 'game-crackers';
+  crackers.setAttribute('aria-hidden', 'true');
+  crackers.textContent = '🎊　　　🎉';
+
+  const message = document.createElement('h3');
+  message.className = 'celebration-message';
+  message.textContent = 'おめでとう！';
+
+  const result = document.createElement('p');
+  result.className = 'celebration-result';
+  result.textContent = `${MAX_SCORE}点満点！`;
+
+  celebration.append(crackers, message, result);
+
+  for (let index = 0; index < 36; index += 1) {
+    const confetti = document.createElement('span');
+    confetti.className = `confetti confetti-color-${(index % 6) + 1}`;
+    confetti.setAttribute('aria-hidden', 'true');
+    confetti.style.left = `${Math.random() * 100}%`;
+    confetti.style.animationDelay = `${Math.random() * 1.2}s`;
+    confetti.style.animationDuration = `${1.8 + Math.random() * 1.8}s`;
+    celebration.appendChild(confetti);
+  }
+
+  const replayButton = document.createElement('button');
+  replayButton.className = 'game-start-btn';
+  replayButton.type = 'button';
+  replayButton.textContent = 'もう一度あそぶ';
+  replayButton.addEventListener('click', startGame);
+  celebration.appendChild(replayButton);
+  balloonGame.appendChild(celebration);
+}
+
+function startGame() {
+  if (gameStarted) {
+    return;
+  }
+
+  gameMode = Math.random() < 0.5 ? 'balloon' : 'bubble';
+  score = 0;
+  scoreCount.textContent = `🎮 ${score} / ${MAX_SCORE}点`;
+  gameStarted = true;
+  balloonGame.classList.add(`mode-${gameMode}`);
+  balloonGame.innerHTML = '';
+  spawnBalloon();
+  balloonInterval = window.setInterval(spawnBalloon, 1100);
 }
 
 playSoundBtn.addEventListener('click', () => {
@@ -211,14 +282,7 @@ playSoundBtn.addEventListener('click', () => {
 });
 
 startGameBtn.addEventListener('click', () => {
-  if (gameStarted) {
-    return;
-  }
-
-  gameStarted = true;
-  startGameBtn.remove();
-  spawnBalloon();
-  balloonInterval = window.setInterval(spawnBalloon, 1100);
+  startGame();
 });
 
 nextBtn.addEventListener('click', () => {
