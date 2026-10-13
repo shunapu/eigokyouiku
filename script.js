@@ -285,6 +285,14 @@ const sightWordsTab = document.getElementById('sightWordsTab');
 const phonicsPanel = document.getElementById('phonicsPanel');
 const sightWordsPanel = document.getElementById('sightWordsPanel');
 const sightWordsList = document.getElementById('sightWordsList');
+const writingHeading = document.getElementById('writingHeading');
+const writingInstructions = document.getElementById('writingInstructions');
+const clearWritingBtn = document.getElementById('clearWritingBtn');
+const writingCanvas = document.getElementById('writingCanvas');
+const writingContext = writingCanvas.getContext('2d');
+let writingTarget = '';
+let writingStrokes = [];
+let activeWritingStroke = null;
 
 function renderAlphabetTable() {
   alphabetGrid.innerHTML = '';
@@ -317,6 +325,7 @@ function renderLesson() {
   const lesson = lessons[currentLessonIndex];
   const total = lessons.length;
 
+  setWritingTarget(`${lesson.letter} ${lesson.lowercase}`);
   lessonLabel.textContent = `レッスン ${currentLessonIndex + 1} / ${total}`;
   progressFill.style.width = `${((currentLessonIndex + 1) / total) * 100}%`;
   letterBig.textContent = lesson.letter;
@@ -360,7 +369,9 @@ function renderSightWords() {
     const item = document.createElement('button');
     item.className = 'sight-word-item';
     item.type = 'button';
+    item.setAttribute('data-word', word);
     item.setAttribute('aria-label', `${word}. Hear pronunciation`);
+    item.setAttribute('aria-pressed', 'false');
 
     const picture = document.createElement('span');
     picture.className = 'sight-word-illustration';
@@ -372,9 +383,92 @@ function renderSightWords() {
     spelling.textContent = word;
 
     item.append(picture, spelling);
-    item.addEventListener('click', () => speak(word, 'en-US'));
+    item.addEventListener('click', () => {
+      setWritingTarget(word);
+      speak(word, 'en-US');
+      sightWordsList.querySelectorAll('.sight-word-item').forEach((card) => {
+        card.setAttribute('aria-pressed', String(card === item));
+      });
+    });
     sightWordsList.appendChild(item);
   });
+}
+
+function setWritingTarget(target) {
+  writingTarget = target;
+  writingStrokes = [];
+  activeWritingStroke = null;
+  const showSightWords = !sightWordsPanel.hidden;
+  writingHeading.textContent = showSightWords ? 'Trace and write' : '文字をなぞろう';
+  writingInstructions.textContent = showSightWords
+    ? 'Trace the dotted word with your mouse or finger.'
+    : '点線をマウスや指でなぞって書いてみよう。';
+  clearWritingBtn.textContent = showSightWords ? 'Clear' : '消す';
+  writingCanvas.setAttribute(
+    'aria-label',
+    showSightWords ? `Tracing area for ${target}` : `${target} のなぞり書きエリア`
+  );
+  drawWritingCanvas();
+}
+
+function resizeWritingCanvas() {
+  const bounds = writingCanvas.getBoundingClientRect();
+  const pixelRatio = window.devicePixelRatio || 1;
+  writingCanvas.width = Math.round(bounds.width * pixelRatio);
+  writingCanvas.height = Math.round(bounds.height * pixelRatio);
+  writingContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+  drawWritingCanvas();
+}
+
+function drawWritingCanvas() {
+  const bounds = writingCanvas.getBoundingClientRect();
+  if (!bounds.width || !bounds.height) {
+    return;
+  }
+
+  writingContext.clearRect(0, 0, bounds.width, bounds.height);
+  writingContext.fillStyle = '#ffffff';
+  writingContext.fillRect(0, 0, bounds.width, bounds.height);
+
+  const characters = [...writingTarget].length;
+  const fontSize = Math.min(112, bounds.height * 0.68, (bounds.width / characters) * 0.78);
+  writingContext.font = `800 ${fontSize}px Arial, sans-serif`;
+  writingContext.textAlign = 'center';
+  writingContext.textBaseline = 'middle';
+  writingContext.lineWidth = 3;
+  writingContext.lineJoin = 'round';
+  writingContext.strokeStyle = '#b8c5d6';
+  writingContext.setLineDash([3, 7]);
+  writingContext.strokeText(writingTarget, bounds.width / 2, bounds.height / 2);
+  writingContext.setLineDash([]);
+
+  writingContext.beginPath();
+  writingContext.lineCap = 'round';
+  writingContext.lineJoin = 'round';
+  writingContext.lineWidth = 7;
+  writingContext.strokeStyle = '#ff8a3d';
+  writingStrokes.forEach((stroke) => {
+    stroke.forEach((point, index) => {
+      const x = point.x * bounds.width;
+      const y = point.y * bounds.height;
+      if (index === 0) {
+        writingContext.moveTo(x, y);
+        writingContext.arc(x, y, 2, 0, Math.PI * 2);
+      } else {
+        writingContext.lineTo(x, y);
+      }
+    });
+    writingContext.stroke();
+    writingContext.beginPath();
+  });
+}
+
+function getWritingPoint(event) {
+  const bounds = writingCanvas.getBoundingClientRect();
+  return {
+    x: (event.clientX - bounds.left) / bounds.width,
+    y: (event.clientY - bounds.top) / bounds.height
+  };
 }
 
 function selectTab(selectedTab) {
@@ -387,6 +481,14 @@ function selectTab(selectedTab) {
   sightWordsTab.tabIndex = showSightWords ? 0 : -1;
   phonicsPanel.hidden = showSightWords;
   sightWordsPanel.hidden = !showSightWords;
+  if (showSightWords) {
+    const selectedCard = sightWordsList.querySelector('.sight-word-item[aria-pressed="true"]');
+    const selectedWord = sightWords.find(({ word }) => word === selectedCard?.getAttribute('data-word')) || sightWords[0];
+    setWritingTarget(selectedWord.word);
+  } else {
+    const lesson = lessons[currentLessonIndex];
+    setWritingTarget(`${lesson.letter} ${lesson.lowercase}`);
+  }
 }
 
 function speak(text, lang = 'ja-JP') {
@@ -518,6 +620,36 @@ startGameBtn.addEventListener('click', () => {
 phonicsTab.addEventListener('click', () => selectTab(phonicsTab));
 sightWordsTab.addEventListener('click', () => selectTab(sightWordsTab));
 
+writingCanvas.addEventListener('pointerdown', (event) => {
+  event.preventDefault();
+  activeWritingStroke = [getWritingPoint(event)];
+  writingStrokes.push(activeWritingStroke);
+  writingCanvas.setPointerCapture(event.pointerId);
+  drawWritingCanvas();
+});
+
+writingCanvas.addEventListener('pointermove', (event) => {
+  if (!activeWritingStroke) {
+    return;
+  }
+
+  activeWritingStroke.push(getWritingPoint(event));
+  drawWritingCanvas();
+});
+
+function finishWritingStroke() {
+  activeWritingStroke = null;
+}
+
+writingCanvas.addEventListener('pointerup', finishWritingStroke);
+writingCanvas.addEventListener('pointercancel', finishWritingStroke);
+clearWritingBtn.addEventListener('click', () => {
+  writingStrokes = [];
+  activeWritingStroke = null;
+  drawWritingCanvas();
+});
+window.addEventListener('resize', resizeWritingCanvas);
+
 [phonicsTab, sightWordsTab].forEach((tab) => {
   tab.addEventListener('keydown', (event) => {
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
@@ -556,3 +688,4 @@ prevBtn.addEventListener('click', () => {
 
 renderSightWords();
 renderLesson();
+resizeWritingCanvas();

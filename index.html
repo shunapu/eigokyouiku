@@ -70,10 +70,21 @@
         <div class="panel sight-words-panel" id="sightWordsPanel" role="tabpanel" aria-labelledby="sightWordsTab" hidden>
           <section class="sight-words-card">
             <h2>Sight Words</h2>
-            <p class="sight-words-intro">Practice 100 common English sight words with illustrations. Tap a card to hear the word.</p>
+            <p class="sight-words-intro">Practice 100 common English sight words with illustrations. Tap a card to hear and trace the word.</p>
             <div class="sight-words-list" id="sightWordsList"></div>
           </section>
         </div>
+
+        <section class="writing-card" aria-labelledby="writingHeading">
+          <div class="writing-header">
+            <div>
+              <h2 id="writingHeading">文字をなぞろう</h2>
+              <p class="writing-instructions" id="writingInstructions">点線をマウスや指でなぞって書いてみよう。</p>
+            </div>
+            <button id="clearWritingBtn" class="secondary" type="button">消す</button>
+          </div>
+          <canvas id="writingCanvas" class="writing-canvas" role="img" aria-label="S s のなぞり書きエリア"></canvas>
+        </section>
       </main>
     </div>
 

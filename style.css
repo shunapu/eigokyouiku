@@ -110,7 +110,8 @@ h1 {
 
 .lesson-card,
 .game-card,
-.sight-words-card {
+.sight-words-card,
+.writing-card {
   background: var(--panel);
   border-radius: 24px;
   box-shadow: 0 10px 30px var(--shadow);
@@ -489,6 +490,48 @@ h1 {
   grid-column: 1 / -1;
 }
 
+.writing-card {
+  margin-top: 18px;
+}
+
+.writing-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.writing-header h2 {
+  margin: 0 0 4px;
+}
+
+.writing-instructions {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.writing-canvas {
+  display: block;
+  width: 100%;
+  height: 180px;
+  border: 2px dashed #d7dfeb;
+  border-radius: 16px;
+  background: #fff;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.writing-canvas:active {
+  cursor: grabbing;
+}
+
+.writing-canvas:focus-visible {
+  outline: 3px solid var(--main-deep);
+  outline-offset: 2px;
+}
+
 .sight-words-card h2 {
   margin: 0 0 8px;
 }
@@ -518,6 +561,11 @@ h1 {
   background: #f9f9ff;
   color: var(--text);
   font-family: inherit;
+}
+
+.sight-word-item[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: #e7f9ff;
 }
 
 .sight-word-illustration {
