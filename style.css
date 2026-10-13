@@ -243,6 +243,28 @@ h1 {
   color: var(--text);
 }
 
+.phonics-word-card {
+  display: grid;
+  grid-template-rows: 1fr 56px;
+  gap: 6px;
+  min-width: 0;
+}
+
+.phonics-word-card .word-item {
+  min-height: 104px;
+}
+
+.phonics-trace-canvas {
+  display: block;
+  width: 100%;
+  height: 56px;
+  border: 1px dashed #d7dfeb;
+  border-radius: 10px;
+  background: #fff;
+  cursor: crosshair;
+  touch-action: none;
+}
+
 .word-illustration {
   font-size: clamp(2.25rem, 5vw, 3.25rem);
   line-height: 1;

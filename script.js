@@ -307,6 +307,7 @@ let writingTarget = '';
 let writingStrokes = [];
 let activeWritingStroke = null;
 let selectedPenColor = penColors[0].value;
+const wordTraceBoards = new Set();
 
 function renderAlphabetTable() {
   alphabetGrid.innerHTML = '';
@@ -347,8 +348,12 @@ function renderLesson() {
 
   renderAlphabetTable();
 
+  wordTraceBoards.clear();
   wordList.innerHTML = '';
   lesson.words.forEach((word) => {
+    const card = document.createElement('div');
+    card.className = 'phonics-word-card';
+
     const item = document.createElement('button');
     item.className = 'word-item';
     item.type = 'button';
@@ -364,7 +369,14 @@ function renderLesson() {
 
     item.append(illustration, label);
     item.addEventListener('click', () => speak(word, 'en-US'));
-    wordList.appendChild(item);
+
+    const traceCanvas = document.createElement('canvas');
+    traceCanvas.className = 'phonics-trace-canvas';
+    traceCanvas.setAttribute('role', 'img');
+    traceCanvas.setAttribute('aria-label', `${word} のなぞり書きエリア`);
+    card.append(item, traceCanvas);
+    wordList.appendChild(card);
+    addWordTraceBoard(traceCanvas, word);
   });
 
   prevBtn.disabled = currentLessonIndex === 0;
@@ -456,57 +468,100 @@ function resizeWritingCanvas() {
   writingCanvas.height = Math.round(bounds.height * pixelRatio);
   writingContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
   drawWritingCanvas();
+  wordTraceBoards.forEach(({ canvas, context, target, strokes }) => {
+    const boardBounds = canvas.getBoundingClientRect();
+    canvas.width = Math.round(boardBounds.width * pixelRatio);
+    canvas.height = Math.round(boardBounds.height * pixelRatio);
+    context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    drawTraceCanvas(canvas, context, target, strokes, 3);
+  });
 }
 
 function drawWritingCanvas() {
-  const bounds = writingCanvas.getBoundingClientRect();
+  drawTraceCanvas(writingCanvas, writingContext, writingTarget, writingStrokes, 7);
+}
+
+function drawTraceCanvas(canvas, context, target, strokes, strokeWidth) {
+  const bounds = canvas.getBoundingClientRect();
   if (!bounds.width || !bounds.height) {
     return;
   }
 
-  writingContext.clearRect(0, 0, bounds.width, bounds.height);
-  writingContext.fillStyle = '#ffffff';
-  writingContext.fillRect(0, 0, bounds.width, bounds.height);
+  context.clearRect(0, 0, bounds.width, bounds.height);
+  context.fillStyle = '#ffffff';
+  context.fillRect(0, 0, bounds.width, bounds.height);
 
-  const characters = [...writingTarget].length;
+  const characters = [...target].length;
   const fontSize = Math.min(112, bounds.height * 0.68, (bounds.width / characters) * 0.78);
-  writingContext.font = `800 ${fontSize}px Arial, sans-serif`;
-  writingContext.textAlign = 'center';
-  writingContext.textBaseline = 'middle';
-  writingContext.lineWidth = 3;
-  writingContext.lineJoin = 'round';
-  writingContext.strokeStyle = '#b8c5d6';
-  writingContext.setLineDash([3, 7]);
-  writingContext.strokeText(writingTarget, bounds.width / 2, bounds.height / 2);
-  writingContext.setLineDash([]);
+  context.font = `800 ${fontSize}px Arial, sans-serif`;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.lineWidth = strokeWidth > 3 ? 3 : 2;
+  context.lineJoin = 'round';
+  context.strokeStyle = '#b8c5d6';
+  context.setLineDash([3, 7]);
+  context.strokeText(target, bounds.width / 2, bounds.height / 2);
+  context.setLineDash([]);
 
-  writingContext.beginPath();
-  writingContext.lineCap = 'round';
-  writingContext.lineJoin = 'round';
-  writingContext.lineWidth = 7;
-  writingStrokes.forEach((stroke) => {
-    writingContext.strokeStyle = stroke.color;
+  context.beginPath();
+  context.lineCap = 'round';
+  context.lineJoin = 'round';
+  context.lineWidth = strokeWidth;
+  strokes.forEach((stroke) => {
+    context.strokeStyle = stroke.color;
     stroke.points.forEach((point, index) => {
       const x = point.x * bounds.width;
       const y = point.y * bounds.height;
       if (index === 0) {
-        writingContext.moveTo(x, y);
-        writingContext.arc(x, y, 2, 0, Math.PI * 2);
+        context.moveTo(x, y);
+        context.arc(x, y, 2, 0, Math.PI * 2);
       } else {
-        writingContext.lineTo(x, y);
+        context.lineTo(x, y);
       }
     });
-    writingContext.stroke();
-    writingContext.beginPath();
+    context.stroke();
+    context.beginPath();
   });
 }
 
 function getWritingPoint(event) {
-  const bounds = writingCanvas.getBoundingClientRect();
+  const bounds = event.currentTarget.getBoundingClientRect();
   return {
     x: Math.max(0, Math.min(1, (event.clientX - bounds.left) / bounds.width)),
     y: Math.max(0, Math.min(1, (event.clientY - bounds.top) / bounds.height))
   };
+}
+
+function addWordTraceBoard(canvas, target) {
+  const context = canvas.getContext('2d');
+  const board = { canvas, context, target, strokes: [], activeStroke: null };
+  const bounds = canvas.getBoundingClientRect();
+  const pixelRatio = window.devicePixelRatio || 1;
+  canvas.width = Math.round(bounds.width * pixelRatio);
+  canvas.height = Math.round(bounds.height * pixelRatio);
+  context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+  wordTraceBoards.add(board);
+
+  canvas.addEventListener('pointerdown', (event) => {
+    event.preventDefault();
+    board.activeStroke = { color: selectedPenColor, points: [getWritingPoint(event)] };
+    board.strokes.push(board.activeStroke);
+    canvas.setPointerCapture(event.pointerId);
+    drawTraceCanvas(canvas, context, target, board.strokes, 3);
+  });
+  canvas.addEventListener('pointermove', (event) => {
+    if (!board.activeStroke) {
+      return;
+    }
+
+    board.activeStroke.points.push(getWritingPoint(event));
+    drawTraceCanvas(canvas, context, target, board.strokes, 3);
+  });
+  const finishStroke = () => {
+    board.activeStroke = null;
+  };
+  canvas.addEventListener('pointerup', finishStroke);
+  canvas.addEventListener('pointercancel', finishStroke);
 }
 
 function selectTab(selectedTab) {
