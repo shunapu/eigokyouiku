@@ -510,16 +510,20 @@ function drawTraceCanvas(canvas, context, target, strokes, strokeWidth) {
   context.fillRect(0, 0, bounds.width, bounds.height);
 
   const characters = [...target].length;
-  const fontSize = Math.min(112, bounds.height * 0.68, (bounds.width / characters) * 0.78);
+  const isWordTrace = strokeWidth <= 3;
+  const fontSize = Math.min(
+    112,
+    bounds.height * (isWordTrace ? 0.82 : 0.68),
+    (bounds.width / characters) * (isWordTrace ? 0.94 : 0.78)
+  );
   context.font = `800 ${fontSize}px Arial, sans-serif`;
   context.textAlign = 'center';
   context.textBaseline = 'middle';
   context.lineWidth = strokeWidth > 3 ? 3 : 2;
   context.lineJoin = 'round';
-  context.strokeStyle = '#b8c5d6';
-  context.setLineDash([3, 7]);
-  context.strokeText(target, bounds.width / 2, bounds.height / 2);
+  context.strokeStyle = '#d5dce5';
   context.setLineDash([]);
+  context.strokeText(target, bounds.width / 2, bounds.height / 2);
 
   context.beginPath();
   context.lineCap = 'round';
