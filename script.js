@@ -306,8 +306,10 @@ const penColors = [
 let writingTarget = '';
 let writingStrokes = [];
 let activeWritingStroke = null;
+const writingStrokesByTarget = new Map();
 let selectedPenColor = penColors[0].value;
 const wordTraceBoards = new Set();
+const wordStrokesByTarget = new Map();
 
 function renderAlphabetTable() {
   alphabetGrid.innerHTML = '';
@@ -387,7 +389,7 @@ function renderLesson() {
         return;
       }
 
-      board.strokes = [];
+      board.strokes.length = 0;
       board.activeStroke = null;
       drawTraceCanvas(board.canvas, board.context, board.target, board.strokes, 3);
     });
@@ -464,8 +466,11 @@ function renderPenColors() {
 
 function setWritingTarget(target) {
   writingTarget = target;
-  writingStrokes = [];
   activeWritingStroke = null;
+  if (!writingStrokesByTarget.has(target)) {
+    writingStrokesByTarget.set(target, []);
+  }
+  writingStrokes = writingStrokesByTarget.get(target);
   const showSightWords = !sightWordsPanel.hidden;
   writingHeading.textContent = showSightWords ? 'Trace and write' : '文字をなぞろう';
   writingInstructions.textContent = showSightWords
@@ -556,13 +561,18 @@ function getWritingPoint(event) {
 
 function addWordTraceBoard(canvas, target) {
   const context = canvas.getContext('2d');
-  const board = { canvas, context, target, strokes: [], activeStroke: null };
+  if (!wordStrokesByTarget.has(target)) {
+    wordStrokesByTarget.set(target, []);
+  }
+  const strokes = wordStrokesByTarget.get(target);
+  const board = { canvas, context, target, strokes, activeStroke: null };
   const bounds = canvas.getBoundingClientRect();
   const pixelRatio = window.devicePixelRatio || 1;
   canvas.width = Math.round(bounds.width * pixelRatio);
   canvas.height = Math.round(bounds.height * pixelRatio);
   context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
   wordTraceBoards.add(board);
+  drawTraceCanvas(canvas, context, target, strokes, 3);
 
   canvas.addEventListener('pointerdown', (event) => {
     event.preventDefault();
@@ -760,6 +770,7 @@ writingCanvas.addEventListener('pointerup', finishWritingStroke);
 writingCanvas.addEventListener('pointercancel', finishWritingStroke);
 clearWritingBtn.addEventListener('click', () => {
   writingStrokes = [];
+  writingStrokesByTarget.set(writingTarget, writingStrokes);
   activeWritingStroke = null;
   drawWritingCanvas();
 });
