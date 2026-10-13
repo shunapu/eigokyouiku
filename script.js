@@ -374,7 +374,25 @@ function renderLesson() {
     traceCanvas.className = 'phonics-trace-canvas';
     traceCanvas.setAttribute('role', 'img');
     traceCanvas.setAttribute('aria-label', `${word} のなぞり書きエリア`);
-    card.append(item, traceCanvas);
+    const traceControls = document.createElement('div');
+    traceControls.className = 'phonics-trace-controls';
+    const clearTraceButton = document.createElement('button');
+    clearTraceButton.className = 'phonics-trace-clear';
+    clearTraceButton.type = 'button';
+    clearTraceButton.textContent = 'Clear';
+    clearTraceButton.setAttribute('aria-label', `Clear ${word} tracing`);
+    clearTraceButton.addEventListener('click', () => {
+      const board = [...wordTraceBoards].find((entry) => entry.canvas === traceCanvas);
+      if (!board) {
+        return;
+      }
+
+      board.strokes = [];
+      board.activeStroke = null;
+      drawTraceCanvas(board.canvas, board.context, board.target, board.strokes, 3);
+    });
+    traceControls.appendChild(clearTraceButton);
+    card.append(item, traceCanvas, traceControls);
     wordList.appendChild(card);
     addWordTraceBoard(traceCanvas, word);
   });
