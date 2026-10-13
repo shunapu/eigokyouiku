@@ -66,6 +66,85 @@ const additionalLessons = [
   { letter: 'Z', phonicsSound: 'ズ', words: ['zebra', 'zip', 'zero'] }
 ];
 
+const wordIllustrations = {
+  sun: '☀️',
+  sock: '🧦',
+  star: '⭐',
+  apple: '🍎',
+  ant: '🐜',
+  cat: '🐱',
+  tap: '🚰',
+  toy: '🧸',
+  tree: '🌳',
+  pig: '🐷',
+  pen: '🖊️',
+  pet: '🐶',
+  moon: '🌙',
+  mouse: '🐭',
+  map: '🗺️',
+  nest: '🪺',
+  net: '🥅',
+  nut: '🥜',
+  ball: '⚽',
+  bat: '🦇',
+  bed: '🛏️',
+  cup: '🥤',
+  cake: '🎂',
+  dog: '🐶',
+  duck: '🦆',
+  desk: '🪑',
+  egg: '🥚',
+  elephant: '🐘',
+  end: '🏁',
+  fish: '🐟',
+  fan: '🪭',
+  fox: '🦊',
+  goat: '🐐',
+  gift: '🎁',
+  gum: '🍬',
+  hat: '👒',
+  hen: '🐔',
+  hop: '🐇',
+  igloo: '🛖',
+  ink: '🖋️',
+  insect: '🐛',
+  jam: '🍯',
+  jet: '✈️',
+  jug: '🏺',
+  kite: '🪁',
+  key: '🔑',
+  kitten: '🐱',
+  lion: '🦁',
+  leg: '🦵',
+  lamp: '💡',
+  octopus: '🐙',
+  ox: '🐂',
+  on: '🔛',
+  queen: '👑',
+  quilt: '🛌',
+  quiz: '❓',
+  rabbit: '🐰',
+  red: '🔴',
+  run: '🏃',
+  umbrella: '☂️',
+  up: '⬆️',
+  under: '⬇️',
+  van: '🚐',
+  vet: '🩺',
+  vest: '🦺',
+  watch: '⌚',
+  web: '🕸️',
+  wig: '👩‍🦱',
+  box: '📦',
+  six: '6️⃣',
+  yak: '🦬',
+  yes: '✅',
+  yell: '📣',
+  zebra: '🦓',
+  zip: '🤐',
+  zero: '0️⃣'
+};
+
 const alphabet = Array.from({ length: 26 }, (_, index) => ({
   upper: String.fromCharCode(65 + index),
   lower: String.fromCharCode(97 + index)
@@ -143,7 +222,16 @@ function renderLesson() {
     item.className = 'word-item';
     item.type = 'button';
     item.setAttribute('aria-label', `${word}の発音を聞く`);
-    item.textContent = word;
+    const illustration = document.createElement('span');
+    illustration.className = 'word-illustration';
+    illustration.setAttribute('aria-hidden', 'true');
+    illustration.textContent = wordIllustrations[word];
+
+    const label = document.createElement('span');
+    label.className = 'word-label';
+    label.textContent = word;
+
+    item.append(illustration, label);
     item.addEventListener('click', () => speak(word, 'en-US'));
     wordList.appendChild(item);
   });
