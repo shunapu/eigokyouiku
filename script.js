@@ -288,11 +288,25 @@ const sightWordsList = document.getElementById('sightWordsList');
 const writingHeading = document.getElementById('writingHeading');
 const writingInstructions = document.getElementById('writingInstructions');
 const clearWritingBtn = document.getElementById('clearWritingBtn');
+const writingColors = document.getElementById('writingColors');
 const writingCanvas = document.getElementById('writingCanvas');
 const writingContext = writingCanvas.getContext('2d');
+const penColors = [
+  { name: 'Red', value: '#e53935' },
+  { name: 'Orange', value: '#fb8c00' },
+  { name: 'Yellow', value: '#fdd835' },
+  { name: 'Green', value: '#43a047' },
+  { name: 'Teal', value: '#00acc1' },
+  { name: 'Blue', value: '#1e88e5' },
+  { name: 'Purple', value: '#8e24aa' },
+  { name: 'Pink', value: '#ec407a' },
+  { name: 'Brown', value: '#6d4c41' },
+  { name: 'Black', value: '#263238' }
+];
 let writingTarget = '';
 let writingStrokes = [];
 let activeWritingStroke = null;
+let selectedPenColor = penColors[0].value;
 
 function renderAlphabetTable() {
   alphabetGrid.innerHTML = '';
@@ -394,6 +408,30 @@ function renderSightWords() {
   });
 }
 
+function renderPenColors() {
+  penColors.forEach(({ name, value }, index) => {
+    const colorButton = document.createElement('button');
+    colorButton.className = 'writing-color';
+    colorButton.type = 'button';
+    colorButton.setAttribute('aria-label', `${name} pen`);
+    colorButton.setAttribute('aria-pressed', String(value === selectedPenColor));
+    colorButton.setAttribute('title', `${name} pen`);
+    colorButton.style.backgroundColor = value;
+    if (index === 0) {
+      colorButton.classList.add('selected');
+    }
+    colorButton.addEventListener('click', () => {
+      selectedPenColor = value;
+      writingColors.querySelectorAll('.writing-color').forEach((button) => {
+        const selected = button === colorButton;
+        button.setAttribute('aria-pressed', String(selected));
+        button.classList.toggle('selected', selected);
+      });
+    });
+    writingColors.appendChild(colorButton);
+  });
+}
+
 function setWritingTarget(target) {
   writingTarget = target;
   writingStrokes = [];
@@ -446,9 +484,9 @@ function drawWritingCanvas() {
   writingContext.lineCap = 'round';
   writingContext.lineJoin = 'round';
   writingContext.lineWidth = 7;
-  writingContext.strokeStyle = '#ff8a3d';
   writingStrokes.forEach((stroke) => {
-    stroke.forEach((point, index) => {
+    writingContext.strokeStyle = stroke.color;
+    stroke.points.forEach((point, index) => {
       const x = point.x * bounds.width;
       const y = point.y * bounds.height;
       if (index === 0) {
@@ -466,8 +504,8 @@ function drawWritingCanvas() {
 function getWritingPoint(event) {
   const bounds = writingCanvas.getBoundingClientRect();
   return {
-    x: (event.clientX - bounds.left) / bounds.width,
-    y: (event.clientY - bounds.top) / bounds.height
+    x: Math.max(0, Math.min(1, (event.clientX - bounds.left) / bounds.width)),
+    y: Math.max(0, Math.min(1, (event.clientY - bounds.top) / bounds.height))
   };
 }
 
@@ -622,7 +660,7 @@ sightWordsTab.addEventListener('click', () => selectTab(sightWordsTab));
 
 writingCanvas.addEventListener('pointerdown', (event) => {
   event.preventDefault();
-  activeWritingStroke = [getWritingPoint(event)];
+  activeWritingStroke = { color: selectedPenColor, points: [getWritingPoint(event)] };
   writingStrokes.push(activeWritingStroke);
   writingCanvas.setPointerCapture(event.pointerId);
   drawWritingCanvas();
@@ -633,7 +671,7 @@ writingCanvas.addEventListener('pointermove', (event) => {
     return;
   }
 
-  activeWritingStroke.push(getWritingPoint(event));
+  activeWritingStroke.points.push(getWritingPoint(event));
   drawWritingCanvas();
 });
 
@@ -687,5 +725,6 @@ prevBtn.addEventListener('click', () => {
 });
 
 renderSightWords();
+renderPenColors();
 renderLesson();
 resizeWritingCanvas();
