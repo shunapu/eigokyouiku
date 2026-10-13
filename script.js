@@ -290,7 +290,7 @@ function renderSightWords() {
     const item = document.createElement('button');
     item.className = 'sight-word-item';
     item.type = 'button';
-    item.setAttribute('aria-label', `${word}。発音をきく`);
+    item.setAttribute('aria-label', `${word}. Hear pronunciation`);
 
     const picture = document.createElement('span');
     picture.className = 'sight-word-illustration';
