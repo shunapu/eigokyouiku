@@ -74,8 +74,43 @@ h1 {
   gap: 18px;
 }
 
+.mode-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 6px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 6px 18px var(--shadow);
+}
+
+.mode-tab {
+  flex: 1;
+  padding: 12px 18px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.mode-tab.active {
+  background: linear-gradient(135deg, var(--main) 0%, var(--pink) 100%);
+  color: white;
+  box-shadow: 0 6px 14px rgba(255, 111, 145, 0.2);
+}
+
+.mode-tab:focus-visible,
+.sight-word-item:focus-visible {
+  outline: 3px solid var(--main-deep);
+  outline-offset: 2px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
 .lesson-card,
-.game-card {
+.game-card,
+.sight-words-card {
   background: var(--panel);
   border-radius: 24px;
   box-shadow: 0 10px 30px var(--shadow);
@@ -450,6 +485,51 @@ h1 {
   grid-column: 1 / -1;
 }
 
+.sight-words-card {
+  grid-column: 1 / -1;
+}
+
+.sight-words-card h2 {
+  margin: 0 0 8px;
+}
+
+.sight-words-intro {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.sight-words-list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.sight-word-item {
+  display: flex;
+  min-height: 140px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 8px;
+  border: 2px solid #e7e9ff;
+  border-radius: 18px;
+  background: #f9f9ff;
+  color: var(--text);
+  font-family: inherit;
+}
+
+.sight-word-illustration {
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+.sight-word-spelling {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
 .alphabet-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -506,7 +586,17 @@ h1 {
     grid-template-columns: 1fr 1fr;
   }
 
+  .sight-words-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .balloon-game {
     height: 300px;
+  }
+}
+
+@media (max-width: 420px) {
+  .sight-words-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

@@ -16,49 +16,64 @@
         <div class="stars" id="scoreCount" role="status" aria-live="polite">🎮 0 / 10点</div>
       </header>
 
-      <main class="panel">
-        <section class="lesson-card">
-          <div class="progress-wrap">
-            <span id="lessonLabel">レッスン 1 / 6</span>
-            <div class="progress-bar">
-              <div id="progressFill"></div>
-            </div>
-          </div>
+      <main>
+        <div class="mode-tabs" role="tablist" aria-label="学習モード">
+          <button id="phonicsTab" class="mode-tab active" type="button" role="tab" aria-selected="true" aria-controls="phonicsPanel">フォニックス</button>
+          <button id="sightWordsTab" class="mode-tab" type="button" role="tab" aria-selected="false" aria-controls="sightWordsPanel" tabindex="-1">サイトワーズ</button>
+        </div>
 
-          <div class="letter-box">
-            <div class="letter-pair">
-              <div class="letter-card uppercase">
-                <span class="label">大文字</span>
-                <span class="letter" id="letterBig">S</span>
-              </div>
-              <div class="letter-card lowercase-card">
-                <span class="label">小文字</span>
-                <span class="letter small" id="letterSmall">s</span>
+        <div class="panel" id="phonicsPanel" role="tabpanel" aria-labelledby="phonicsTab">
+          <section class="lesson-card">
+            <div class="progress-wrap">
+              <span id="lessonLabel">レッスン 1 / 6</span>
+              <div class="progress-bar">
+                <div id="progressFill"></div>
               </div>
             </div>
-            <button class="sound-btn" id="playSoundBtn">🔊 音を聞く</button>
-          </div>
 
-          <div class="word-list" id="wordList"></div>
+            <div class="letter-box">
+              <div class="letter-pair">
+                <div class="letter-card uppercase">
+                  <span class="label">大文字</span>
+                  <span class="letter" id="letterBig">S</span>
+                </div>
+                <div class="letter-card lowercase-card">
+                  <span class="label">小文字</span>
+                  <span class="letter small" id="letterSmall">s</span>
+                </div>
+              </div>
+              <button class="sound-btn" id="playSoundBtn">🔊 音を聞く</button>
+            </div>
 
-          <div class="actions">
-            <button id="prevBtn" class="secondary">前へ</button>
-            <button id="nextBtn" class="primary">次へ</button>
-          </div>
-        </section>
+            <div class="word-list" id="wordList"></div>
 
-        <section class="game-card">
-          <h2>風船・泡ゲーム</h2>
-          <p class="game-instructions">上に飛んでいく風船か泡をタップしてポイントをゲット！</p>
-          <div id="balloonGame" class="balloon-game" aria-label="アルファベットの風船・泡ゲーム">
-            <button id="startGameBtn" class="game-start-btn" type="button">▶ ゲームスタート</button>
-          </div>
-        </section>
+            <div class="actions">
+              <button id="prevBtn" class="secondary">前へ</button>
+              <button id="nextBtn" class="primary">次へ</button>
+            </div>
+          </section>
 
-        <section class="alphabet-card">
-          <h2>アルファベット表</h2>
-          <div id="alphabetGrid" class="alphabet-grid"></div>
-        </section>
+          <section class="game-card">
+            <h2>風船・泡ゲーム</h2>
+            <p class="game-instructions">上に飛んでいく風船か泡をタップしてポイントをゲット！</p>
+            <div id="balloonGame" class="balloon-game" aria-label="アルファベットの風船・泡ゲーム">
+              <button id="startGameBtn" class="game-start-btn" type="button">▶ ゲームスタート</button>
+            </div>
+          </section>
+
+          <section class="alphabet-card">
+            <h2>アルファベット表</h2>
+            <div id="alphabetGrid" class="alphabet-grid"></div>
+          </section>
+        </div>
+
+        <div class="panel sight-words-panel" id="sightWordsPanel" role="tabpanel" aria-labelledby="sightWordsTab" hidden>
+          <section class="sight-words-card">
+            <h2>サイトワーズ</h2>
+            <p class="sight-words-intro">よくつかう英単語を、イラストといっしょにおぼえよう。カードをおすと発音がきけるよ。</p>
+            <div class="sight-words-list" id="sightWordsList"></div>
+          </section>
+        </div>
       </main>
     </div>
 

@@ -145,6 +145,39 @@ const wordIllustrations = {
   zero: '0️⃣'
 };
 
+const sightWords = [
+  { word: 'I', illustration: '🙋' },
+  { word: 'you', illustration: '👉' },
+  { word: 'we', illustration: '🧑‍🤝‍🧑' },
+  { word: 'he', illustration: '👦' },
+  { word: 'she', illustration: '👧' },
+  { word: 'my', illustration: '🧸' },
+  { word: 'me', illustration: '🙋‍♀️' },
+  { word: 'a', illustration: '1️⃣' },
+  { word: 'the', illustration: '📖' },
+  { word: 'and', illustration: '➕' },
+  { word: 'is', illustration: '💬' },
+  { word: 'are', illustration: '👥' },
+  { word: 'it', illustration: '📦' },
+  { word: 'can', illustration: '💪' },
+  { word: 'see', illustration: '👀' },
+  { word: 'like', illustration: '❤️' },
+  { word: 'go', illustration: '🚶' },
+  { word: 'to', illustration: '➡️' },
+  { word: 'in', illustration: '📥' },
+  { word: 'on', illustration: '⬆️' },
+  { word: 'up', illustration: '🎈' },
+  { word: 'down', illustration: '⬇️' },
+  { word: 'look', illustration: '🔍' },
+  { word: 'play', illustration: '🛝' },
+  { word: 'come', illustration: '👋' },
+  { word: 'here', illustration: '📍' },
+  { word: 'big', illustration: '🐘' },
+  { word: 'little', illustration: '🐭' },
+  { word: 'red', illustration: '🔴' },
+  { word: 'blue', illustration: '🔵' }
+];
+
 const alphabet = Array.from({ length: 26 }, (_, index) => ({
   upper: String.fromCharCode(65 + index),
   lower: String.fromCharCode(97 + index)
@@ -177,6 +210,11 @@ const scoreCount = document.getElementById('scoreCount');
 const alphabetGrid = document.getElementById('alphabetGrid');
 const balloonGame = document.getElementById('balloonGame');
 const startGameBtn = document.getElementById('startGameBtn');
+const phonicsTab = document.getElementById('phonicsTab');
+const sightWordsTab = document.getElementById('sightWordsTab');
+const phonicsPanel = document.getElementById('phonicsPanel');
+const sightWordsPanel = document.getElementById('sightWordsPanel');
+const sightWordsList = document.getElementById('sightWordsList');
 
 function renderAlphabetTable() {
   alphabetGrid.innerHTML = '';
@@ -245,6 +283,40 @@ function renderLesson() {
   } else {
     balloonGame.appendChild(startGameBtn);
   }
+}
+
+function renderSightWords() {
+  sightWords.forEach(({ word, illustration }) => {
+    const item = document.createElement('button');
+    item.className = 'sight-word-item';
+    item.type = 'button';
+    item.setAttribute('aria-label', `${word}。発音をきく`);
+
+    const picture = document.createElement('span');
+    picture.className = 'sight-word-illustration';
+    picture.setAttribute('aria-hidden', 'true');
+    picture.textContent = illustration;
+
+    const spelling = document.createElement('span');
+    spelling.className = 'sight-word-spelling';
+    spelling.textContent = word;
+
+    item.append(picture, spelling);
+    item.addEventListener('click', () => speak(word, 'en-US'));
+    sightWordsList.appendChild(item);
+  });
+}
+
+function selectTab(selectedTab) {
+  const showSightWords = selectedTab === sightWordsTab;
+  phonicsTab.classList.toggle('active', !showSightWords);
+  phonicsTab.setAttribute('aria-selected', String(!showSightWords));
+  phonicsTab.tabIndex = showSightWords ? -1 : 0;
+  sightWordsTab.classList.toggle('active', showSightWords);
+  sightWordsTab.setAttribute('aria-selected', String(showSightWords));
+  sightWordsTab.tabIndex = showSightWords ? 0 : -1;
+  phonicsPanel.hidden = showSightWords;
+  sightWordsPanel.hidden = !showSightWords;
 }
 
 function speak(text, lang = 'ja-JP') {
@@ -373,6 +445,25 @@ startGameBtn.addEventListener('click', () => {
   startGame();
 });
 
+phonicsTab.addEventListener('click', () => selectTab(phonicsTab));
+sightWordsTab.addEventListener('click', () => selectTab(sightWordsTab));
+
+[phonicsTab, sightWordsTab].forEach((tab) => {
+  tab.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      event.preventDefault();
+      const nextTab = tab === phonicsTab ? sightWordsTab : phonicsTab;
+      selectTab(nextTab);
+      nextTab.focus();
+    } else if (event.key === 'Home' || event.key === 'End') {
+      event.preventDefault();
+      const nextTab = event.key === 'Home' ? phonicsTab : sightWordsTab;
+      selectTab(nextTab);
+      nextTab.focus();
+    }
+  });
+});
+
 nextBtn.addEventListener('click', () => {
   if (currentLessonIndex < lessons.length - 1) {
     currentLessonIndex += 1;
@@ -393,4 +484,5 @@ prevBtn.addEventListener('click', () => {
   }
 });
 
+renderSightWords();
 renderLesson();
