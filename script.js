@@ -297,6 +297,7 @@ const quizNextBtn = document.getElementById('quizNextBtn');
 const quizResult = document.getElementById('quizResult');
 const quizResultMessage = document.getElementById('quizResultMessage');
 const quizRestartBtn = document.getElementById('quizRestartBtn');
+const quizAnswerList = document.getElementById('quizAnswerList');
 const writingCard = document.querySelector('.writing-card');
 const writingHeading = document.getElementById('writingHeading');
 const writingInstructions = document.getElementById('writingInstructions');
@@ -523,10 +524,34 @@ function renderQuizQuestion() {
   });
 }
 
+function renderQuizAnswerTable() {
+  quizAnswerList.innerHTML = '';
+  quizQuestions.forEach(({ word }) => {
+    const item = document.createElement('button');
+    item.className = 'quiz-answer-item';
+    item.type = 'button';
+    item.setAttribute('aria-label', `${word}の発音を聞く`);
+
+    const picture = document.createElement('span');
+    picture.className = 'quiz-answer-illustration';
+    picture.setAttribute('aria-hidden', 'true');
+    picture.textContent = wordIllustrations[word];
+
+    const spelling = document.createElement('span');
+    spelling.className = 'quiz-answer-word';
+    spelling.textContent = word;
+
+    item.append(picture, spelling);
+    item.addEventListener('click', () => speak(word, 'en-US'));
+    quizAnswerList.appendChild(item);
+  });
+}
+
 function startQuiz() {
   quizQuestions = createQuizQuestions();
   currentQuizQuestionIndex = 0;
   quizScore = 0;
+  renderQuizAnswerTable();
   renderQuizQuestion();
 }
 
