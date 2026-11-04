@@ -254,6 +254,7 @@ const alphabet = Array.from({ length: 26 }, (_, index) => ({
 }));
 
 const MAX_SCORE = 10;
+const QUIZ_QUESTION_COUNT = 10;
 
 additionalLessons.forEach((lesson) => {
   lessons.push({
@@ -282,9 +283,21 @@ const balloonGame = document.getElementById('balloonGame');
 const startGameBtn = document.getElementById('startGameBtn');
 const phonicsTab = document.getElementById('phonicsTab');
 const sightWordsTab = document.getElementById('sightWordsTab');
+const quizTab = document.getElementById('quizTab');
 const phonicsPanel = document.getElementById('phonicsPanel');
 const sightWordsPanel = document.getElementById('sightWordsPanel');
+const quizPanel = document.getElementById('quizPanel');
 const sightWordsList = document.getElementById('sightWordsList');
+const quizQuestion = document.getElementById('quizQuestion');
+const quizProgress = document.getElementById('quizProgress');
+const quizIllustration = document.getElementById('quizIllustration');
+const quizChoices = document.getElementById('quizChoices');
+const quizFeedback = document.getElementById('quizFeedback');
+const quizNextBtn = document.getElementById('quizNextBtn');
+const quizResult = document.getElementById('quizResult');
+const quizResultMessage = document.getElementById('quizResultMessage');
+const quizRestartBtn = document.getElementById('quizRestartBtn');
+const writingCard = document.querySelector('.writing-card');
 const writingHeading = document.getElementById('writingHeading');
 const writingInstructions = document.getElementById('writingInstructions');
 const clearWritingBtn = document.getElementById('clearWritingBtn');
@@ -310,6 +323,9 @@ const writingStrokesByTarget = new Map();
 let selectedPenColor = penColors[0].value;
 const wordTraceBoards = new Set();
 const wordStrokesByTarget = new Map();
+let quizQuestions = [];
+let currentQuizQuestionIndex = 0;
+let quizScore = 0;
 
 function renderAlphabetTable() {
   alphabetGrid.innerHTML = '';
@@ -438,6 +454,91 @@ function renderSightWords() {
     });
     sightWordsList.appendChild(item);
   });
+}
+
+function shuffle(items) {
+  const shuffledItems = [...items];
+  for (let index = shuffledItems.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [shuffledItems[index], shuffledItems[swapIndex]] = [shuffledItems[swapIndex], shuffledItems[index]];
+  }
+  return shuffledItems;
+}
+
+function createQuizQuestions() {
+  const words = shuffle(Object.keys(wordIllustrations)).slice(0, QUIZ_QUESTION_COUNT);
+  return words.map((word) => {
+    const distractors = Object.keys(wordIllustrations).filter(
+      (candidate) => wordIllustrations[candidate] !== wordIllustrations[word]
+    );
+    return {
+      word,
+      choices: shuffle([word, ...shuffle(distractors).slice(0, 2)])
+    };
+  });
+}
+
+function renderQuizQuestion() {
+  const question = quizQuestions[currentQuizQuestionIndex];
+  quizQuestion.hidden = false;
+  quizResult.hidden = true;
+  quizProgress.textContent = `もんだい ${currentQuizQuestionIndex + 1} / ${QUIZ_QUESTION_COUNT}　正解 ${quizScore}`;
+  quizIllustration.textContent = wordIllustrations[question.word];
+  quizIllustration.setAttribute('aria-label', `${question.word} のイラスト`);
+  quizChoices.innerHTML = '';
+  quizFeedback.textContent = '';
+  quizFeedback.className = 'quiz-feedback';
+  quizNextBtn.hidden = true;
+  quizNextBtn.textContent = currentQuizQuestionIndex === QUIZ_QUESTION_COUNT - 1 ? '結果を見る' : 'つぎの問題';
+
+  question.choices.forEach((word) => {
+    const choice = document.createElement('button');
+    choice.className = 'quiz-choice';
+    choice.type = 'button';
+    choice.textContent = word;
+    choice.addEventListener('click', () => {
+      if (quizNextBtn.hidden === false) {
+        return;
+      }
+
+      const isCorrect = word === question.word;
+      if (isCorrect) {
+        quizScore += 1;
+      }
+      quizProgress.textContent = `もんだい ${currentQuizQuestionIndex + 1} / ${QUIZ_QUESTION_COUNT}　正解 ${quizScore}`;
+      quizFeedback.textContent = isCorrect ? 'せいかい！' : `おしい！ こたえは「${question.word}」`;
+      quizFeedback.classList.add(isCorrect ? 'correct' : 'incorrect');
+      quizChoices.querySelectorAll('.quiz-choice').forEach((button) => {
+        button.disabled = true;
+        if (button.textContent === question.word) {
+          button.classList.add('correct');
+        } else if (button === choice) {
+          button.classList.add('incorrect');
+        }
+      });
+      quizNextBtn.hidden = false;
+    });
+    quizChoices.appendChild(choice);
+  });
+}
+
+function startQuiz() {
+  quizQuestions = createQuizQuestions();
+  currentQuizQuestionIndex = 0;
+  quizScore = 0;
+  renderQuizQuestion();
+}
+
+function advanceQuiz() {
+  if (currentQuizQuestionIndex < QUIZ_QUESTION_COUNT - 1) {
+    currentQuizQuestionIndex += 1;
+    renderQuizQuestion();
+    return;
+  }
+
+  quizQuestion.hidden = true;
+  quizResult.hidden = false;
+  quizResultMessage.textContent = `${QUIZ_QUESTION_COUNT}問中 ${quizScore}問正解！`;
 }
 
 function renderPenColors() {
@@ -597,20 +698,26 @@ function addWordTraceBoard(canvas, target) {
 }
 
 function selectTab(selectedTab) {
+  const tabs = [
+    { tab: phonicsTab, panel: phonicsPanel },
+    { tab: sightWordsTab, panel: sightWordsPanel },
+    { tab: quizTab, panel: quizPanel }
+  ];
+  tabs.forEach(({ tab, panel }) => {
+    const selected = tab === selectedTab;
+    tab.classList.toggle('active', selected);
+    tab.setAttribute('aria-selected', String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+    panel.hidden = !selected;
+  });
   const showSightWords = selectedTab === sightWordsTab;
-  phonicsTab.classList.toggle('active', !showSightWords);
-  phonicsTab.setAttribute('aria-selected', String(!showSightWords));
-  phonicsTab.tabIndex = showSightWords ? -1 : 0;
-  sightWordsTab.classList.toggle('active', showSightWords);
-  sightWordsTab.setAttribute('aria-selected', String(showSightWords));
-  sightWordsTab.tabIndex = showSightWords ? 0 : -1;
-  phonicsPanel.hidden = showSightWords;
-  sightWordsPanel.hidden = !showSightWords;
+  const showQuiz = selectedTab === quizTab;
+  writingCard.hidden = showQuiz;
   if (showSightWords) {
     const selectedCard = sightWordsList.querySelector('.sight-word-item[aria-pressed="true"]');
     const selectedWord = sightWords.find(({ word }) => word === selectedCard?.getAttribute('data-word')) || sightWords[0];
     setWritingTarget(selectedWord.word);
-  } else {
+  } else if (!showQuiz) {
     const lesson = lessons[currentLessonIndex];
     setWritingTarget(`${lesson.letter} ${lesson.lowercase}`);
   }
@@ -744,6 +851,9 @@ startGameBtn.addEventListener('click', () => {
 
 phonicsTab.addEventListener('click', () => selectTab(phonicsTab));
 sightWordsTab.addEventListener('click', () => selectTab(sightWordsTab));
+quizTab.addEventListener('click', () => selectTab(quizTab));
+quizNextBtn.addEventListener('click', advanceQuiz);
+quizRestartBtn.addEventListener('click', startQuiz);
 
 writingCanvas.addEventListener('pointerdown', (event) => {
   event.preventDefault();
@@ -776,16 +886,17 @@ clearWritingBtn.addEventListener('click', () => {
 });
 window.addEventListener('resize', resizeWritingCanvas);
 
-[phonicsTab, sightWordsTab].forEach((tab) => {
+[phonicsTab, sightWordsTab, quizTab].forEach((tab, index, tabs) => {
   tab.addEventListener('keydown', (event) => {
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault();
-      const nextTab = tab === phonicsTab ? sightWordsTab : phonicsTab;
+      const offset = event.key === 'ArrowRight' ? 1 : -1;
+      const nextTab = tabs[(index + offset + tabs.length) % tabs.length];
       selectTab(nextTab);
       nextTab.focus();
     } else if (event.key === 'Home' || event.key === 'End') {
       event.preventDefault();
-      const nextTab = event.key === 'Home' ? phonicsTab : sightWordsTab;
+      const nextTab = event.key === 'Home' ? tabs[0] : tabs[tabs.length - 1];
       selectTab(nextTab);
       nextTab.focus();
     }
@@ -813,6 +924,7 @@ prevBtn.addEventListener('click', () => {
 });
 
 renderSightWords();
+startQuiz();
 renderPenColors();
 renderLesson();
 resizeWritingCanvas();

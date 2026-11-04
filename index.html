@@ -20,6 +20,7 @@
         <div class="mode-tabs" role="tablist" aria-label="Learning modes">
           <button id="phonicsTab" class="mode-tab active" type="button" role="tab" aria-selected="true" aria-controls="phonicsPanel">Phonics</button>
           <button id="sightWordsTab" class="mode-tab" type="button" role="tab" aria-selected="false" aria-controls="sightWordsPanel" tabindex="-1">Sight Words</button>
+          <button id="quizTab" class="mode-tab" type="button" role="tab" aria-selected="false" aria-controls="quizPanel" tabindex="-1">イラストクイズ</button>
         </div>
 
         <div class="panel" id="phonicsPanel" role="tabpanel" aria-labelledby="phonicsTab">
@@ -72,6 +73,24 @@
             <h2>Sight Words</h2>
             <p class="sight-words-intro">Practice 100 common English sight words with illustrations. Tap a card to hear and trace the word.</p>
             <div class="sight-words-list" id="sightWordsList"></div>
+          </section>
+        </div>
+
+        <div class="panel quiz-panel" id="quizPanel" role="tabpanel" aria-labelledby="quizTab" hidden>
+          <section class="quiz-card">
+            <h2>イラストの英単語をえらぼう！</h2>
+            <p class="quiz-instructions">イラストにあう英単語を3つの中からえらんでね。</p>
+            <div id="quizQuestion">
+              <p id="quizProgress" class="quiz-progress" role="status"></p>
+              <div id="quizIllustration" class="quiz-illustration" role="img"></div>
+              <div id="quizChoices" class="quiz-choices" role="group" aria-label="英単語の選択肢"></div>
+              <p id="quizFeedback" class="quiz-feedback" role="status" aria-live="polite"></p>
+              <button id="quizNextBtn" class="primary" type="button" hidden>つぎの問題</button>
+            </div>
+            <div id="quizResult" class="quiz-result" role="status" aria-live="polite" hidden>
+              <p id="quizResultMessage"></p>
+              <button id="quizRestartBtn" class="primary" type="button">もう一度あそぶ</button>
+            </div>
           </section>
         </div>
 
