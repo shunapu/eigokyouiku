@@ -501,6 +501,7 @@ function renderQuizQuestion() {
         return;
       }
 
+      speak(word, 'en-US');
       const isCorrect = word === question.word;
       if (isCorrect) {
         quizScore += 1;
