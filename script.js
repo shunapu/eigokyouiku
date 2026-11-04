@@ -526,7 +526,7 @@ function renderQuizQuestion() {
 
 function renderQuizAnswerTable() {
   quizAnswerList.innerHTML = '';
-  quizQuestions.forEach(({ word }) => {
+  Object.keys(wordIllustrations).forEach((word) => {
     const item = document.createElement('button');
     item.className = 'quiz-answer-item';
     item.type = 'button';
